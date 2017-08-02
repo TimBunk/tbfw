@@ -19,7 +19,7 @@ class Mesh {
 
 public:
 
-	Mesh(const char* fileName);
+	Mesh(MeshData meshData);
 	~Mesh();
 
 	void DrawTextures(Shader* shader);

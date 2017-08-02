@@ -1,11 +1,8 @@
 #include "mesh.h"
 #include "OBJloader.h"
 
-Mesh::Mesh(const char* fileName)
+Mesh::Mesh(MeshData meshData)
 {
-	// Load the meshData's vertices
-	meshData = OBJloader::LoadObject(fileName);
-
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
@@ -22,6 +19,7 @@ Mesh::Mesh(const char* fileName)
 	glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
 	delete meshData.vertices;
+	this->meshData = meshData;
 }
 
 Mesh::~Mesh()

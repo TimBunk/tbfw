@@ -15,10 +15,12 @@ class OBJloader {
 
 public:
 
-	static MeshData LoadObject(const char* fileName);
+	static std::vector<Mesh*> LoadObject(const char* fileName, bool hasTextureCoord, bool hasNormalCoord);
 
 private:
 
+	static void LoadVertices(std::ifstream& obj, char* reader, std::vector<glm::vec3>& tmp_vertices, std::vector<glm::vec2>& tmp_textures, std::vector<glm::vec3>& tmp_normals);
+	static GLfloat* LoadIndices(std::ifstream& obj, char* reader, bool& moreMeshes, int& verticesArraySize, std::vector<unsigned int>& vertexIndices, std::vector<unsigned int>& textureIndices, std::vector<unsigned int>& normalIndices, std::vector<glm::vec3>& tmp_vertices, std::vector<glm::vec2>& tmp_textures, std::vector<glm::vec3>& tmp_normals);
 
 };
 

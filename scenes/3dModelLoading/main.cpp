@@ -39,7 +39,6 @@ void CalculateFrameRate();
 float num = 0;
 
 Camera* camera;
-Mesh* mesh;
 void MouseCallback(GLFWwindow * window, double xPos, double yPos);
 void ScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 
@@ -78,9 +77,12 @@ int main() {
 	camera->ShowCursor(window, false);
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
-	mesh = new Mesh("assets//dragon.obj");
-	mesh->WireframeMode(false);
-	mesh->SetAmountOfTextures(0, 0, 0);
+	std::vector<Mesh*> meshes = OBJloader::LoadObject("assets//waterWell10.obj", true, true);
+	//mesh = new Mesh("assets//dragon.obj");
+	for (int i = 0; i < meshes.size(); i++) {
+		meshes[i]->WireframeMode(false);
+		meshes[i]->SetAmountOfTextures(0, 0, 0);
+	}
 	//mesh->AddTexture(Tex::LoadTexture("textures//JapaneseFarmHouseUV.png", TextureWrap::repeat, TextureFilter::linear, TextureType::diffuse));
 	//mesh->AddTexture(Tex::LoadTexture("textures//JapaneseFarmHouseUV.png", TextureWrap::repeat, TextureFilter::linear, TextureType::specular));
 	//mesh->AddTexture(tex::LoadTexture("textures//JapaneseFarmHouseUV.png", tex::TextureWrap::repeat, tex::TextureFilter::linear, tex::TextureType::emission));
@@ -123,7 +125,9 @@ int main() {
 			directionalLight->SetVec3Float("light.diffuse", glm::vec3(0.780392f, 0.568627f, 0.113725f));
 			directionalLight->SetVec3Float("light.specular", glm::vec3(0.992157f, 0.941176f, 0.807843f));
 			directionalLight->SetFloat("material.shininess", 0.4f * 128.0f);
-			mesh->Draw();
+			for (int i = 0; i < meshes.size(); i++) {
+				meshes[i]->Draw();
+			}
 
 			// reset the deltaTime
 			deltaTime = 0;
@@ -137,7 +141,9 @@ int main() {
 	}
 
 	// clear all allocated glfw resources
-	delete mesh;
+	for (int i = 0; i < meshes.size(); i++) {
+		delete meshes[i];
+	}
 	delete directionalLight;
 	delete camera;
 	glfwDestroyWindow(window);
