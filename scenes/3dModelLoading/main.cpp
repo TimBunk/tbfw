@@ -77,7 +77,7 @@ int main() {
 	camera->ShowCursor(window, false);
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
-	std::vector<Mesh*> meshes = OBJloader::LoadObject("assets//waterWell10.obj", true, true);
+	std::vector<Mesh*> meshes = OBJloader::LoadObject("assets//waterWell10.obj", true, true, true, true);
 	//mesh = new Mesh("assets//dragon.obj");
 	for (int i = 0; i < meshes.size(); i++) {
 		meshes[i]->WireframeMode(false);

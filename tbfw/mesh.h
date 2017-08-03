@@ -19,7 +19,7 @@ class Mesh {
 
 public:
 
-	Mesh(MeshData meshData);
+	Mesh(MeshData meshData, bool enableTextCoord, bool hasTextCoord, bool enableNormCoord, bool hasNormCoord);
 	~Mesh();
 
 	void DrawTextures(Shader* shader);

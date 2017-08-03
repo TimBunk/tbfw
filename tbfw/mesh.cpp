@@ -1,8 +1,17 @@
 #include "mesh.h"
 #include "OBJloader.h"
 
-Mesh::Mesh(MeshData meshData)
+Mesh::Mesh(MeshData meshData, bool enableTextCoord, bool hasTextCoord, bool enableNormCoord, bool hasNormCoord)
 {
+	unsigned int offset = 0;
+	unsigned int multiplier = 3;
+	if (hasTextCoord) {
+		multiplier += 2;
+	}
+	if (hasNormCoord) {
+		multiplier += 3;
+	}
+
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
@@ -11,12 +20,20 @@ Mesh::Mesh(MeshData meshData)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, meshData.amountVertices * sizeof(GLfloat), &meshData.vertices[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid*)offset);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
+	offset += 3;
+	if (hasTextCoord && enableTextCoord) {
+		std::cout << "enabled textCoord" << std::endl;
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid*)(offset * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+		offset += 2;
+	}
+	if (hasNormCoord && enableNormCoord) {
+		std::cout << "enabled normCoord" << std::endl;
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid *)(offset * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
+	}
 	glBindVertexArray(0);
 	delete meshData.vertices;
 	this->meshData = meshData;
