@@ -8,9 +8,9 @@
 #include <ios>
 
 #include <gl\glew.h>
-#include <glm-0.9.9.0\glm\glm.hpp>
-#include <glm-0.9.9.0\glm\gtc\matrix_transform.hpp>
-#include <glm-0.9.9.0\glm\gtc\type_ptr.hpp>
+#include <glm-0.9.8.4\glm\glm.hpp>
+#include <glm-0.9.8.4\glm\gtc\matrix_transform.hpp>
+#include <glm-0.9.8.4\glm\gtc\type_ptr.hpp>
 
 class Shader {
 public:
@@ -21,7 +21,7 @@ public:
 	void ReloadShaders();
 	void SetBool(const std::string &name, bool value);
 	void SetInt(const std::string &name, int value);
-	void SetUnsignedInt(const std::string &name, int value);
+	void SetUnsignedInt(const std::string &name, unsigned int value);
 	void SetFloat(const std::string &name, float value);
 	void SetVec2Float(const std::string &name, glm::vec2 value);
 	void SetVec3Float(const std::string &name, glm::vec3 value);

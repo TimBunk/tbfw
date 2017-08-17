@@ -1,7 +1,7 @@
 #include "mesh.h"
 #include "OBJloader.h"
 
-Mesh::Mesh(MeshData meshData, bool enableTextCoord, bool hasTextCoord, bool enableNormCoord, bool hasNormCoord)
+Mesh::Mesh(MeshData meshData, bool normalMapping, bool enableTextCoord, bool hasTextCoord, bool enableNormCoord, bool hasNormCoord)
 {
 	unsigned int offset = 0;
 	unsigned int multiplier = 3;
@@ -10,6 +10,9 @@ Mesh::Mesh(MeshData meshData, bool enableTextCoord, bool hasTextCoord, bool enab
 	}
 	if (hasNormCoord) {
 		multiplier += 3;
+	}
+	if (normalMapping) {
+		multiplier += 6;
 	}
 
 	glGenVertexArrays(1, &VAO);
@@ -20,23 +23,41 @@ Mesh::Mesh(MeshData meshData, bool enableTextCoord, bool hasTextCoord, bool enab
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, meshData.amountVertices * sizeof(GLfloat), &meshData.vertices[0], GL_STATIC_DRAW);
 
+	// set the vertices
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid*)offset);
 	glEnableVertexAttribArray(0);
 	offset += 3;
+	// set the textCoordinates
 	if (hasTextCoord && enableTextCoord) {
-		std::cout << "enabled textCoord" << std::endl;
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid*)(offset * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
 		offset += 2;
 	}
+	else if (hasTextCoord && !enableTextCoord) {
+		offset += 2;
+	}
+	// set the normalCoordinates
 	if (hasNormCoord && enableNormCoord) {
-		std::cout << "enabled normCoord" << std::endl;
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid *)(offset * sizeof(GLfloat)));
 		glEnableVertexAttribArray(2);
+		offset += 3;
+	}
+	else if (hasNormCoord && !enableNormCoord) {
+		offset += 3;
+	}
+	if (normalMapping) {
+		// set the tangent
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid *)(offset * sizeof(GLfloat)));
+		glEnableVertexAttribArray(3);
+		offset += 3;
+		// set the bitangent
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, multiplier * sizeof(GLfloat), (GLvoid *)(offset * sizeof(GLfloat)));
+		glEnableVertexAttribArray(4);
+		offset += 3;
 	}
 	glBindVertexArray(0);
+	this->amountVertices = meshData.amountVertices;
 	delete meshData.vertices;
-	this->meshData = meshData;
 }
 
 Mesh::~Mesh()
@@ -70,7 +91,12 @@ void Mesh::DrawTextures(Shader * shader)
 			ss << emissionCount++;
 		}
 		number = ss.str();
-		shader->SetInt(("material." + name + "[" + number + "]").c_str(), textures[i].id);
+		if (name != "normalMap") {
+			shader->SetInt(("material." + name + "[" + number + "]").c_str(), textures[i].id);
+		}
+		else if (name == "normalMap") {
+			shader->SetInt(("material." + name).c_str(), textures[i].id);
+		}
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 	Draw();
@@ -81,7 +107,8 @@ void Mesh::DrawTextures(Shader * shader)
 void Mesh::Draw()
 {
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, meshData.amountVertices);
+	float amount = (amountVertices/8);
+	glDrawArrays(GL_TRIANGLES, 0, amount);
 	// Set everything back to default once configured
 	glBindVertexArray(0);
 }

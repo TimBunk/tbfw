@@ -5,9 +5,9 @@
 
 #include <gl\glew.h>
 #include <glfw3.h>
-#include <glm-0.9.9.0\glm\glm.hpp>
-#include <glm-0.9.9.0\glm\gtc\matrix_transform.hpp>
-#include <glm-0.9.9.0\glm\gtc\type_ptr.hpp>
+#include <glm-0.9.8.4\glm\glm.hpp>
+#include <glm-0.9.8.4\glm\gtc\matrix_transform.hpp>
+#include <glm-0.9.8.4\glm\gtc\type_ptr.hpp>
 
 #include "shader.h"
 #include "texture.h"
@@ -41,6 +41,8 @@ float num = 0;
 Camera* camera;
 void MouseCallback(GLFWwindow * window, double xPos, double yPos);
 void ScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+
+std::vector<Mesh*> meshes;
 
 int main() {
 	// initialize and configure glfw
@@ -77,23 +79,23 @@ int main() {
 	camera->ShowCursor(window, false);
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
-	std::vector<Mesh*> meshes = OBJloader::LoadObject("assets//waterWell10.obj", true, true, true, true);
+	meshes = OBJloader::LoadObject("assets//JapaneseFarmHouse7.obj", false, true, true, true, true);
 	//mesh = new Mesh("assets//dragon.obj");
 	for (int i = 0; i < meshes.size(); i++) {
 		meshes[i]->WireframeMode(false);
-		meshes[i]->SetAmountOfTextures(0, 0, 0);
+		meshes[i]->SetAmountOfTextures(1, 0, 0);
 	}
-	//mesh->AddTexture(Tex::LoadTexture("textures//JapaneseFarmHouseUV.png", TextureWrap::repeat, TextureFilter::linear, TextureType::diffuse));
-	//mesh->AddTexture(Tex::LoadTexture("textures//JapaneseFarmHouseUV.png", TextureWrap::repeat, TextureFilter::linear, TextureType::specular));
+	meshes[0]->AddTexture(Tex::LoadTexture("textures//JapaneseFarmHouseUV.png", TextureWrap::repeat, TextureFilter::linear, TextureType::diffuse));
+	//meshes[0]->AddTexture(Tex::LoadTexture("textures//T_N-Bastet_DIF.png", TextureWrap::repeat, TextureFilter::linear, TextureType::diffuse));
+	//meshes[0]->AddTexture(Tex::LoadTexture("textures//T_N-Bastet_SPC.png", TextureWrap::repeat, TextureFilter::linear, TextureType::specular));
 	//mesh->AddTexture(tex::LoadTexture("textures//JapaneseFarmHouseUV.png", tex::TextureWrap::repeat, tex::TextureFilter::linear, tex::TextureType::emission));
-
 	directionalLight->Use();
 	// cyan plastic material. Found in this link http://devernay.free.fr/cours/opengl/materials.html
-	directionalLight->SetVec3Float("material.ambient", glm::vec3(0.24725f, 0.1995f, 0.0745f));
-	directionalLight->SetVec3Float("material.diffuse", glm::vec3(0.75164f, 0.60648f, 0.22648f));
-	directionalLight->SetVec3Float("material.specular", glm::vec3(0.628281f, 0.555802f, 0.366065f));
+	/*directionalLight->SetVec3Float("material.ambient", glm::vec3(0.05375f, 0.05f, 0.06625f));
+	directionalLight->SetVec3Float("material.diffuse", glm::vec3(0.18275f, 0.17f, 0.22525f));
+	directionalLight->SetVec3Float("material.specular", glm::vec3(0.332741f, 0.328634f, 0.346435f));*/
 
-	float vis = 0.0f;
+	float vis = 1.0f;
 	float rotation = 0.0f;
 	camera->SetPosition(glm::vec3(2.0f, 6.0f, 17.0f));
 	// render/update loop
@@ -114,6 +116,8 @@ int main() {
 			pos = glm::translate(pos, glm::vec3(1.0f));
 			rotation += 0.5f;
 			pos = glm::rotate(pos, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+			pos = glm::scale(pos, glm::vec3(0.1f));
+			
 			directionalLight->SetMatrix4("transform", pos);
 			directionalLight->SetMatrix4("view", camera->GetViewMatrix());
 			directionalLight->SetMatrix4("projection", camera->GetProjectionMatrix());
@@ -121,12 +125,16 @@ int main() {
 			directionalLight->SetVec3Float("viewPos", camera->GetPosition());
 
 			directionalLight->SetVec3Float("light.direction", glm::vec3(-1.0f, 1.0f, -1.0f));
-			directionalLight->SetVec3Float("light.ambient", glm::vec3(0.329412f, 0.223529f, 0.027451f));
+			/*directionalLight->SetVec3Float("light.ambient", glm::vec3(0.329412f, 0.223529f, 0.027451f));
 			directionalLight->SetVec3Float("light.diffuse", glm::vec3(0.780392f, 0.568627f, 0.113725f));
-			directionalLight->SetVec3Float("light.specular", glm::vec3(0.992157f, 0.941176f, 0.807843f));
+			directionalLight->SetVec3Float("light.specular", glm::vec3(0.992157f, 0.941176f, 0.807843f));*/
+			directionalLight->SetVec3Float("light.ambient", glm::vec3(1.0f));
+			directionalLight->SetVec3Float("light.diffuse", glm::vec3(1.0f));
+			directionalLight->SetVec3Float("light.specular", glm::vec3(1.0f));
 			directionalLight->SetFloat("material.shininess", 0.4f * 128.0f);
+			directionalLight->SetFloat("visibility", vis);
 			for (int i = 0; i < meshes.size(); i++) {
-				meshes[i]->Draw();
+				meshes[i]->DrawTextures(directionalLight);
 			}
 
 			// reset the deltaTime
@@ -165,7 +173,7 @@ void ProcessInput(GLFWwindow * window)
 		glfwSetWindowShouldClose(window, true);
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-
+		Tex::SaveImage(&screenWidth, &screenHeight);
 	}
 	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 
@@ -176,12 +184,15 @@ void ProcessInput(GLFWwindow * window)
 	else if (glfwGetKey(window, GLFW_KEY_R) == GLFW_RELEASE && reloadKey) {
 		reloadKey = false;
 	}
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !screenshotKey) {
-		screenshotKey = true;
-		Tex::SaveImage(&screenWidth, &screenHeight);
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+		for (int i = 0; i < meshes.size(); i++) {
+			meshes[i]->WireframeMode(true);
+		}
 	}
-	else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE && screenshotKey) {
-		screenshotKey = false;
+	else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE) {
+		for (int i = 0; i < meshes.size(); i++) {
+			meshes[i]->WireframeMode(false);
+		}
 	}
 
 	float speed = 2.0f*deltaTime;
@@ -201,7 +212,7 @@ void ProcessInput(GLFWwindow * window)
 
 void CreateShaders()
 {
-	directionalLight = new Shader("shaders\\vertex.vs", "shaders\\directionalLightOnMaterial.fs");
+	directionalLight = new Shader("shaders\\vertex.vs", "shaders\\directionalLight.fs");
 }
 
 void CalculateFrameRate()
@@ -209,7 +220,6 @@ void CalculateFrameRate()
 	float currentFrame = glfwGetTime();
 	_deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-
 	deltaTime += _deltaTime;
 
 	totalTime += _deltaTime;

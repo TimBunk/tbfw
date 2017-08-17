@@ -24,7 +24,7 @@ add_subdirectory (external)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/external/glfw-3.2.1/include/GLFW
-  ${CMAKE_SOURCE_DIR}/external/glew-2.0.0/include
+  ${CMAKE_SOURCE_DIR}/external/glew-2.1.0/include
   ${CMAKE_SOURCE_DIR}/external/SOIL2/src
   ${CMAKE_SOURCE_DIR}/external
   ${CMAKE_SOURCE_DIR}/tbfw
@@ -32,8 +32,8 @@ include_directories(
 
 link_directories(
   ${CMAKE_SOURCE_DIR}/external/glfw-3.2.1/src
-  ${CMAKE_SOURCE_DIR}/external/glew-2.0.0
-  ${CMAKE_SOURCE_DIR}/external/glm-0.9.9.0
+  ${CMAKE_SOURCE_DIR}/external/glew-2.1.0
+  ${CMAKE_SOURCE_DIR}/external/glm-0.9.8.4
   ${CMAKE_SOURCE_DIR}/external
 )
 

@@ -6,8 +6,8 @@
 
 #include <GL\glew.h>
 #include <glfw3.h>
-#include <glm-0.9.9.0\glm\glm.hpp>
-#include <glm-0.9.9.0\glm\gtc\matrix_transform.hpp>
+#include <glm-0.9.8.4\glm\glm.hpp>
+#include <glm-0.9.8.4\glm\gtc\matrix_transform.hpp>
 
 class Camera {
 

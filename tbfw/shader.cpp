@@ -40,7 +40,7 @@ void Shader::SetInt(const std::string & name, int value)
 	}
 }
 
-void Shader::SetUnsignedInt(const std::string & name, int value)
+void Shader::SetUnsignedInt(const std::string & name, unsigned int value)
 {
 	GLint uniformLoc = GetUniformLocation(name);
 	if (uniformLoc != -1) {

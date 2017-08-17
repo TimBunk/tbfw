@@ -19,7 +19,7 @@ class Mesh {
 
 public:
 
-	Mesh(MeshData meshData, bool enableTextCoord, bool hasTextCoord, bool enableNormCoord, bool hasNormCoord);
+	Mesh(MeshData meshData, bool normalMapping, bool enableTextCoord, bool hasTextCoord, bool enableNormCoord, bool hasNormCoord);
 	~Mesh();
 
 	void DrawTextures(Shader* shader);
@@ -30,7 +30,7 @@ public:
 	void AddTexture(Texture texture);
 
 private:
-	MeshData meshData;
+	unsigned int amountVertices;
 	GLuint VBO, VAO;
 
 	unsigned int diffuseMaps, specularMaps, emissionMaps;

@@ -2787,6 +2787,10 @@ int query_NPOT_capability( void )
 			/*	it's there!	*/
 			has_NPOT_capability = SOIL_CAPABILITY_PRESENT;
 		}
+
+		#if defined( __emscripten__ ) || defined( EMSCRIPTEN )
+		has_NPOT_capability = SOIL_CAPABILITY_PRESENT;
+		#endif
 	}
 	/*	let the user know if we can do non-power-of-two textures or not	*/
 	return has_NPOT_capability;
@@ -3028,6 +3032,15 @@ int query_gen_mipmap_capability( void )
 			if(ext_addr == NULL)
 			{
 				ext_addr = (P_SOIL_GLGENERATEMIPMAPPROC)SOIL_GL_GetProcAddress("glGenerateMipmapEXT");
+			}
+
+			#elif !defined( SOIL_NO_EGL )
+
+			ext_addr = (P_SOIL_GLGENERATEMIPMAPPROC)SOIL_GL_GetProcAddress("glGenerateMipmapOES");
+
+			if(ext_addr == NULL)
+			{
+				ext_addr = (P_SOIL_GLGENERATEMIPMAPPROC)SOIL_GL_GetProcAddress("glGenerateMipmap");
 			}
 
 			#elif defined( SOIL_GLES2 )
