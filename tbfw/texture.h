@@ -27,6 +27,7 @@ enum TextureType {
 	diffuse,
 	specular,
 	emission,
+	normalMap
 };
 
 class Tex {

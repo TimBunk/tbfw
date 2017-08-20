@@ -17,6 +17,7 @@
 const unsigned int screenWidth = 800, screenHeight = 600;
 
 Shader* directionalLight;
+Shader* directionalLightWithoutNormalMap;
 
 float visibility = 0.2;
 float positionX = 0;
@@ -82,14 +83,31 @@ int main() {
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
 
-	dragon = OBJloader::LoadObject("assets//dragon.obj", false, true, true, true, true);
-	dragon[0]->SetAmountOfTextures(0, 0, 0);
+	// textures
+	Texture diff;
+	diff = Tex::LoadTexture("textures//T_N-Bastet_DIF.png", TextureWrap::repeat, TextureFilter::linear, TextureType::diffuse);
+	Texture spc;
+	spc = Tex::LoadTexture("textures//T_N-Bastet_SPC.png", TextureWrap::repeat, TextureFilter::linear, TextureType::specular);
+	Texture nrm;
+	nrm = Tex::LoadTexture("textures//T_N-Bastet_NRM.png", TextureWrap::repeat, TextureFilter::linear, TextureType::normalMap);
 
-	directionalLight->Use();
+	// with normal map
+	dragon = OBJloader::LoadObject("assets//SM_Bastet.obj", true, true, true, true, true);
+	dragon[0]->SetAmountOfTextures(1, 1, 0);
+	dragon[0]->AddTexture(diff);
+	dragon[0]->AddTexture(spc);
+	dragon[0]->AddTexture(nrm);
+
+	// without normal map
+	/*bastetWithoutNormalMap = OBJloader::LoadObject("assets//SM_Bastet.obj", false, true, true, true, true);
+	bastetWithoutNormalMap[0]->SetAmountOfTextures(1, 1, 0);
+	bastetWithoutNormalMap[0]->AddTexture(diff);
+	bastetWithoutNormalMap[0]->AddTexture(spc);*/
+
 	// cyan plastic material. Found in this link http://devernay.free.fr/cours/opengl/materials.html
-	directionalLight->SetVec3Float("material.ambient", glm::vec3(0.24725f, 0.1995f, 0.0745));
-	directionalLight->SetVec3Float("material.diffuse", glm::vec3(0.75164f, 0.60648f, 0.22648f));
-	directionalLight->SetVec3Float("material.specular", glm::vec3(0.628281f, 0.555802f, 0.366065f));
+	/*directionalLight->SetVec3Float("material.ambient", glm::vec3(0.05375f, 0.05f, 0.06625f));
+	directionalLight->SetVec3Float("material.diffuse", glm::vec3(0.18275f, 0.17f, 0.22525f));
+	directionalLight->SetVec3Float("material.specular", glm::vec3(0.332741f, 0.328634f, 0.346435f));*/
 
 	float vis = 1.0f;
 	camera->SetPosition(glm::vec3(2.0f, 6.0f, 17.0f));
@@ -109,8 +127,8 @@ int main() {
 
 			glm::mat4 pos;
 			pos = glm::translate(pos, glm::vec3(1.0f));
-			rotation += 0.5f;
 			pos = glm::rotate(pos, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+			pos = glm::scale(pos, glm::vec3(0.1f));
 			
 			directionalLight->SetMatrix4("transform", pos);
 			directionalLight->SetMatrix4("view", camera->GetViewMatrix());
@@ -119,11 +137,39 @@ int main() {
 			directionalLight->SetVec3Float("viewPos", camera->GetPosition());
 
 			directionalLight->SetVec3Float("light.direction", glm::vec3(-1.0f, 1.0f, -1.0f));
-			directionalLight->SetVec3Float("light.ambient", glm::vec3(0.6f));
-			directionalLight->SetVec3Float("light.diffuse", glm::vec3(0.6f));
-			directionalLight->SetVec3Float("light.specular", glm::vec3(0.6f));
+			directionalLight->SetVec3Float("light.ambient", glm::vec3(1.0f));
+			directionalLight->SetVec3Float("light.diffuse", glm::vec3(1.0f));
+			directionalLight->SetVec3Float("light.specular", glm::vec3(1.0f));
 			directionalLight->SetFloat("material.shininess", 0.4f * 128.0f);
-			dragon[0]->Draw();
+			directionalLight->SetFloat("visibility", vis);
+			for (int i = 0; i < dragon.size(); i++) {
+				dragon[i]->DrawTextures(directionalLight);
+			}
+
+			// draw bastet without normal map
+			/*directionalLightWithoutNormalMap->Use();
+
+			glm::mat4 pos2;
+			pos2 = glm::translate(pos2, glm::vec3(6.0f, 1.0f, 1.0f));
+			pos2 = glm::rotate(pos2, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+			pos2 = glm::scale(pos2, glm::vec3(0.1f));
+
+			directionalLightWithoutNormalMap->SetMatrix4("transform", pos2);
+			directionalLightWithoutNormalMap->SetMatrix4("view", camera->GetViewMatrix());
+			directionalLightWithoutNormalMap->SetMatrix4("projection", camera->GetProjectionMatrix());
+
+			directionalLightWithoutNormalMap->SetVec3Float("viewPos", camera->GetPosition());
+
+			directionalLightWithoutNormalMap->SetVec3Float("light.direction", glm::vec3(-1.0f, 1.0f, -1.0f));
+			directionalLightWithoutNormalMap->SetVec3Float("light.ambient", glm::vec3(1.0f));
+			directionalLightWithoutNormalMap->SetVec3Float("light.diffuse", glm::vec3(1.0f));
+			directionalLightWithoutNormalMap->SetVec3Float("light.specular", glm::vec3(1.0f));
+			directionalLightWithoutNormalMap->SetFloat("material.shininess", 0.4f * 128.0f);
+			directionalLightWithoutNormalMap->SetFloat("visibility", vis);
+			for (int i = 0; i < bastetWithoutNormalMap.size(); i++) {
+				bastetWithoutNormalMap[i]->DrawTextures(directionalLightWithoutNormalMap);
+			}*/
+
 
 			// reset the deltaTime
 			deltaTime = 0;
@@ -138,7 +184,9 @@ int main() {
 
 	// clear all allocated glfw resources
 	delete dragon[0];
+	//delete bastetWithoutNormalMap[0];
 	delete directionalLight;
+	delete directionalLightWithoutNormalMap;
 	delete camera;
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -194,7 +242,8 @@ void ProcessInput(GLFWwindow * window)
 
 void CreateShaders()
 {
-	directionalLight = new Shader("shaders\\vertex.vs", "shaders\\directionalLightOnMaterial.fs");
+	directionalLight = new Shader("shaders\\vertexWithNormalMap.vs", "shaders\\directionalLightWithNormalMap.fs");
+	directionalLightWithoutNormalMap = new Shader("shaders\\vertex.vs", "shaders\\directionalLight.fs");
 }
 
 void CalculateFrameRate()

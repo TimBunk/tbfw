@@ -57,6 +57,9 @@ Texture Tex::LoadTexture(const char * filePath, TextureWrap textureWrap, Texture
 	case emission:
 		type = "emission";
 		break;
+	case normalMap:
+		type = "normalMap";
+		break;
 	}
 	// load the image data and create Mipmap
 	data = SOIL_load_image(filePath, &width, &height, 0, SOIL_LOAD_RGBA);

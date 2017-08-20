@@ -182,4 +182,12 @@ IF(MAKE_DEMO_SCENES)
   target_link_libraries(3dModelLoading
 		${ALL_GRAPHICS_LIBS}
 	)
+  add_executable(normalMapping
+    ${SOILSOURCE}
+    ${TBFWSOURCE}
+    scenes/normalMapping/main.cpp
+  )
+  target_link_libraries(normalMapping
+		${ALL_GRAPHICS_LIBS}
+	)
 ENDIF()

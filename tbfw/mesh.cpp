@@ -56,7 +56,7 @@ Mesh::Mesh(MeshData meshData, bool normalMapping, bool enableTextCoord, bool has
 		offset += 3;
 	}
 	glBindVertexArray(0);
-	this->amountVertices = meshData.amountVertices;
+	this->amountVertices = (meshData.amountVertices/multiplier);
 	delete meshData.vertices;
 }
 
@@ -82,7 +82,7 @@ void Mesh::DrawTextures(Shader * shader)
 		std::string number;
 		std::string name = textures[i].type;
 		if (name == "diffuse") {
-			ss << diffuseCount++; // NOTE to self: In C++ the increment call: variable++ returns the variable as is and then increments the variable 
+			ss << diffuseCount++; // NOTE to self: In this case C++ the increment call: variable++ returns the variable as is and then increments the variable 
 		}
 		else if (name == "specular") {
 			ss << specularCount++;
@@ -90,13 +90,13 @@ void Mesh::DrawTextures(Shader * shader)
 		else if (name == "emission") {
 			ss << emissionCount++;
 		}
-		number = ss.str();
-		if (name != "normalMap") {
-			shader->SetInt(("material." + name + "[" + number + "]").c_str(), textures[i].id);
-		}
 		else if (name == "normalMap") {
 			shader->SetInt(("material." + name).c_str(), textures[i].id);
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+			continue;
 		}
+		number = ss.str();
+		shader->SetInt(("material." + name + "[" + number + "]").c_str(), textures[i].id);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 	Draw();
@@ -107,8 +107,7 @@ void Mesh::DrawTextures(Shader * shader)
 void Mesh::Draw()
 {
 	glBindVertexArray(VAO);
-	float amount = (amountVertices/8);
-	glDrawArrays(GL_TRIANGLES, 0, amount);
+	glDrawArrays(GL_TRIANGLES, 0, amountVertices);
 	// Set everything back to default once configured
 	glBindVertexArray(0);
 }

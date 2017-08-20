@@ -37,29 +37,24 @@ std::vector<Mesh*> OBJloader::LoadObject(const char * fileName, bool normalMappi
 			}
 			// load face with vertices, textures and normals
 			if (hasTextCoord && hasNormCoord) {
-				std::cout << "load face with vertices, textures and normals" << std::endl;
 				vertices = OBJloader::LoadFaces(obj, reader, moreMeshes, verticesArraySize, normalMapping, vertexIndices, textureIndices, normalIndices, tmp_vertices, tmp_textures, tmp_normals);
 			}
 			// load face with vertices
 			else if (!hasTextCoord && !hasNormCoord) {
-				std::cout << "load face with vertices" << std::endl;
 				vertices = OBJloader::LoadFacesWithVertices(obj, reader, moreMeshes, verticesArraySize, vertexIndices, tmp_vertices);
 			}
 			// load face with vertices and textures
 			else if (hasTextCoord && !hasNormCoord) {
-				std::cout << "load face with vertices and textures" << std::endl;
 				vertices = OBJloader::LoadFacesWithTextures(obj, reader, moreMeshes, verticesArraySize, vertexIndices, textureIndices, tmp_vertices, tmp_textures);
 			}
 			// load face with vertices nad normals
 			else if (!hasTextCoord && hasNormCoord) {
-				std::cout << "load face with vertices and normals" << std::endl;
 				vertices = OBJloader::LoadFacesWithNormals(obj, reader, moreMeshes, verticesArraySize, vertexIndices, normalIndices, tmp_vertices, tmp_normals);
 			}
 			// create the actual mesh and push it in a vector
 			MeshData meshData;
 			meshData.vertices = vertices;
 			meshData.amountVertices = verticesArraySize;
-			std::cout << "verticesArraysize: " << verticesArraySize << std::endl;
 			Mesh* mesh;
 			mesh = new Mesh(meshData, normalMapping, enableTextCoord, hasTextCoord, enableNormCoord, hasNormCoord);
 			meshes.push_back(mesh);
@@ -192,7 +187,6 @@ GLfloat* OBJloader::LoadFaces(std::ifstream& obj, char* reader, bool& moreMeshes
 		vertices[i * multiplier + 2] = tmp_vertices[vertexIndex].z;
 
 		unsigned int textureIndex = textureIndices[i];
-		std::cout << "textureIndex: " << textureIndex << std::endl;
 		vertices[i * multiplier + 3] = tmp_textures[textureIndex].x;
 		vertices[i * multiplier + 4] = tmp_textures[textureIndex].y;
 
